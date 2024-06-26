@@ -122,7 +122,7 @@ def main():
         st.write('A project by [BOTARMY](https://botarmy-web.streamlit.app/) - \
 Need AI training / consulting? [Get in touch](mailto:jjusturi@gmail.com)')
     if not st.session_state.train:
-        st.warning("Pulse el boton en la barra lateral para comenzar a habalr, por favor")
+        st.warning("Pulse el boton en la barra lateral para comenzar a hablar, por favor")
 
     if st.session_state.train:
         st.write("<h5><br>Pregunte lo que necesite sobre Manta Hospital center, no importa el idioma, somos multiculturales!:</h5>", unsafe_allow_html=True)
