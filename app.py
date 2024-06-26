@@ -1,6 +1,6 @@
 import streamlit as st
 from dotenv import load_dotenv
-from PyPDF2 import PdfReader
+import fitz  # PyMuPDF
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -13,10 +13,11 @@ import os
 
 def get_pdf_text(pdf_list):
     text = ""
-    for pdf in pdf_list:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+    for pdf_path in pdf_list:
+        pdf_document = fitz.open(pdf_path)
+        for page_num in range(len(pdf_document)):
+            page = pdf_document.load_page(page_num)
+            text += page.get_text()
     return text
 
 def get_text_chunks(text):
