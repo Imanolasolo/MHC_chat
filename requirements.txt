@@ -67,11 +67,11 @@ orjson==3.10.5
 packaging==23.2
 pandas==2.2.2
 pillow==10.3.0
-pipdeptree==2.2.0
+pipdeptree==2.2.0 
 platformdirs==4.2.2
 protobuf==3.20.1
 pyarrow==16.1.0
-pycairo @ file:///home/mhc/MHC_Chatbot/pycairo
+# pycairo @ file:///home/mhc/MHC_Chatbot/pycairo
 pydantic==2.7.4
 pydantic_core==2.18.4
 pydeck==0.9.1
