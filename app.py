@@ -74,11 +74,11 @@ def main():
 
     if "pdf_text" not in st.session_state:
         st.session_state.pdf_text = ""
-    col1, col2 = st.columns ([1, 6])
+    col1, col2 = st.columns ([1, 2])
     with col1:
-        st.info("starwars_logo.png")
+        st.image("mhc_logo.png", width = 200)
     with col2:
-        st.header("Manta Hospital Center - FAQ :hospital:")
+        st.header("Manta Hospital Center - FAQ ")
 
     with st.sidebar:
         
