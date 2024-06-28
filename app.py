@@ -10,7 +10,6 @@ from langchain.chat_models import ChatOpenAI
 from htmlTemplates import css, bot_template, user_template
 import os
 
-
 def get_pdf_text(pdf_list):
     text = ""
     for pdf_path in pdf_list:
@@ -57,78 +56,39 @@ def handle_userInput(user_question):
             st.write(user_template.replace("{{MSG}}", msg.content), unsafe_allow_html=True)
         else:
             st.write(bot_template.replace("{{MSG}}", msg.content), unsafe_allow_html=True)
+    st.session_state.chat_history = []  # Reset chat history after each response
 
 def main():
     load_dotenv()
-
     st.set_page_config(page_title="Manta Hospital Center AI", page_icon=":hospital:")
     st.write(css, unsafe_allow_html=True)
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
-
-    if "train" not in st.session_state:
-        st.session_state.train = False
+        st.session_state.chat_history = []
 
     if "pdf_text" not in st.session_state:
         st.session_state.pdf_text = ""
-    col1, col2 = st.columns ([1, 2])
+
+    # Pre-train the model with the PDF
+    sample_pdf_path = os.path.join(os.getcwd(), "base_conocimiento_MHC.pdf")
+    st.session_state.pdf_files = [sample_pdf_path]
+
+    raw_text = get_pdf_text(st.session_state.pdf_files)
+    st.session_state.pdf_text = raw_text
+    text_chunks = get_text_chunks(raw_text)
+    vector_store = get_vector_store(text_chunks)
+    st.session_state.conversation = get_conversation_chain(vector_store)
+    col1, col2 = st.columns ([1,2])
     with col1:
-        st.image("mhc_logo.png", width = 200)
+        st.image('mhc_logo.png', width=200)
     with col2:
-        st.header("Manta Hospital Center - FAQ ")
-
-    with st.sidebar:
-        
-        st.subheader(":file_folder: Manta Hospital Center FAQ")
-        
-        #use_sample_pdf = st.checkbox("Talk with BOTARMY_HUB Bot")
-        #if use_sample_pdf:
-        sample_pdf_path = os.path.join(os.getcwd(), "base_conocimiento_MHC.pdf")
-        st.session_state.pdf_files = [sample_pdf_path]
-        #else:
-            #st.session_state.pdf_files = st.file_uploader("Talk with your own trained agents", type=['pdf'], accept_multiple_files=True)
-
-        #st.session_state.api_key = st.text_input("Enter your OpenAI API key:")
-        train = st.button("Hable con nuestra IA")
-        if train:
-            with st.spinner("Procesando"):
-                # get the text from PDFs
-                raw_text = get_pdf_text(st.session_state.pdf_files)
-                st.session_state.pdf_text = raw_text
-                # get the text chunks
-                text_chunks = get_text_chunks(raw_text)
-                # create vector store
-                vector_store = get_vector_store(text_chunks)
-                # conversation chain
-                st.session_state.conversation = get_conversation_chain(vector_store)
-                # set train to True to indicate agent has been trained
-                st.session_state.train = True
-        st.subheader(":question: Preguntas que puede hacer a nuestro asistente")
-        with st.expander("Expandir preguntas"):
-            # Lista de instrucciones
-            instrucciones = [
-                "1. ¿Que servicios provee MHC?",
-                "2. ¿Como es el proceso de admision de un paciente?",
-                "3. ¿Donde esta situado el Manta Hospital Center?",
-                
-            ]
-
-            # Renderizar la lista de instrucciones
-            for instruccion in instrucciones:
-                st.markdown(instruccion)
-        st.write('A project by [BOTARMY](https://botarmy-web.streamlit.app/) - \
-Need AI training / consulting? [Get in touch](mailto:jjusturi@gmail.com)')
-    if not st.session_state.train:
-        st.warning("Pulse el boton en la barra lateral para comenzar a hablar, por favor")
-
-    if st.session_state.train:
-        st.write("<h5><br>Pregunte lo que necesite sobre Manta Hospital center, no importa el idioma, somos multiculturales!:</h5>", unsafe_allow_html=True)
-        user_question = st.text_input(label="", placeholder="Enter something...")
-        if user_question:
-            handle_userInput(user_question)
+        st.header("Manta Hospital Center - FAQ")
+    st.write("<h5><br>Pregunte lo que necesite sobre Manta Hospital center, no importa el idioma, somos multiculturales!:</h5>", unsafe_allow_html=True)
+    user_question = st.text_input(label="", placeholder="Enter something...")
+    if user_question:
+        handle_userInput(user_question)
 
 if __name__ == "__main__":
     main()
